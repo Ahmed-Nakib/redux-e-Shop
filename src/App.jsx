@@ -8,6 +8,7 @@ import Cart from "./pages/Cart.jsx";
 import ProductDetails from "./component/ProductDetails.jsx";
 import Footer from "./component/Footer.jsx";
 import Contact from "./pages/ContactPage.jsx";
+import CategoryView from "./component/CategoryView.jsx";
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
         <Route path="/cart" element={<Cart />} />
         <Route path="/product-details/:id" element={<ProductDetails />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/category/:name" element={<CategoryView />} />
       </Routes>
       <Footer />
     </div>

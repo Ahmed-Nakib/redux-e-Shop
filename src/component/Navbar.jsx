@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { motion as Motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Search, User, ShoppingCart } from "lucide-react";
 import { NavLink, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -17,60 +16,43 @@ export default function Navbar() {
   const mobileMenuRef = useRef(null);
   const totalCartItems = useSelector(selectCartTotalItems);
 
-  // body scroll lock
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "auto";
     return () => (document.body.style.overflow = "auto");
   }, [open]);
 
-  // close on Escape
   useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    const handleEsc = (e) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
-  useEffect(() => {
-    if (open) {
-      const btn = mobileMenuRef.current?.querySelector("button[data-close]");
-      btn?.focus();
-    }
-  }, [open]);
-
   return (
-    <header className="w-full bg-white/95 backdrop-blur-md border-b border-slate-200 fixed top-0 z-50">
+    <header className="w-full bg-white/90 backdrop-blur-md border-b border-gray-200 fixed top-0 left-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Brand */}
-          <div className="flex items-center gap-4">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-cyan-500 flex items-center justify-center text-white font-bold">
-                PN
-              </div>
-              <div className="hidden sm:block">
-                <span className="font-semibold text-lg text-slate-900">
-                  ShopName
-                </span>
-                <div className="text-xs text-slate-500 -mt-0.5">
-                  Fast & Stylish
-                </div>
-              </div>
-            </Link>
-          </div>
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-cyan-500 flex items-center justify-center rounded-xl text-white font-bold">
+              PN
+            </div>
+            <div className="hidden sm:block leading-tight">
+              <h1 className="text-lg font-semibold text-gray-900">ShopName</h1>
+              <p className="text-xs text-gray-500">Fast & Stylish</p>
+            </div>
+          </Link>
 
-          {/* Desktop Links */}
-          <nav className="hidden md:flex gap-1 items-center ml-6">
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex gap-1 items-center">
             {navLinks.map((link) => (
               <NavLink
                 key={link.name}
                 to={link.href}
                 className={({ isActive }) =>
-                  `px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  `px-4 py-2 rounded-md text-sm font-medium transition-all ${
                     isActive
-                      ? "bg-indigo-600 text-white shadow-sm"
-                      : "text-slate-700 hover:text-slate-900 hover:bg-slate-50"
+                      ? "bg-indigo-600 text-white"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-indigo-600"
                   }`
                 }
               >
@@ -79,19 +61,20 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* Right actions */}
-          <div className="flex items-center gap-3">
+          {/* Actions */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Search */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              aria-label="Search"
-              className="items-center gap-2 px-3 py-2 rounded-md text-sm font-medium bg-slate-50 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              className="hidden sm:flex items-center justify-center w-9 h-9 rounded-md hover:bg-gray-100"
             >
               <Search size={18} />
             </button>
 
+            {/* Cart */}
             <Link
               to="/cart"
-              className="p-2 rounded-md hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-300 relative"
+              className="relative w-9 h-9 flex items-center justify-center rounded-md hover:bg-gray-100"
             >
               <ShoppingCart size={20} />
               {totalCartItems > 0 && (
@@ -101,81 +84,52 @@ export default function Navbar() {
               )}
             </Link>
 
-            <button
-              aria-haspopup="true"
-              aria-label="Account"
-              className="p-2 rounded-md hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-            >
+            {/* Profile */}
+            <button className="hidden sm:flex items-center justify-center w-9 h-9 rounded-md hover:bg-gray-100">
               <User size={18} />
             </button>
 
-            {/* Mobile menu button */}
+            {/* Mobile Menu Toggle */}
             <button
-              onClick={() => setOpen(true)}
-              aria-label="Open menu"
-              className="inline-flex items-center justify-center p-2 rounded-md md:hidden hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              onClick={() => setOpen(!open)}
+              className="md:hidden w-9 h-9 flex items-center justify-center rounded-md hover:bg-gray-100"
             >
-              <Menu size={20} />
+              {open ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Nav */}
       {open && (
-        <div className="absolute right-0 top-0 h-full w-64 bg-gray-900 text-white p-5 flex flex-col shadow-2xl">
-          {/* Top Section */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">Menu</h2>
-            <button
-              data-close
+        <div
+          ref={mobileMenuRef}
+          className="md:hidden absolute top-16 left-0 w-full bg-gray-900 text-white flex flex-col py-6 px-5 space-y-3 shadow-lg transition-all"
+        >
+          {navLinks.map((link) => (
+            <NavLink
+              key={link.name}
+              to={link.href}
               onClick={() => setOpen(false)}
-              aria-label="Close menu"
-              className="p-2 hover:bg-gray-800 rounded-md transition"
+              className={({ isActive }) =>
+                `block px-4 py-2 rounded-lg ${
+                  isActive ? "bg-indigo-600" : "hover:bg-gray-800"
+                }`
+              }
             >
-              <X size={20} />
-            </button>
-          </div>
-
-          {/* Navigation Links */}
-          <nav className="flex-1">
-            <ul className="flex flex-col gap-2">
-              {navLinks.map((link) => (
-                <li key={link.name}>
-                  <NavLink
-                    to={link.href}
-                    onClick={() => setOpen(false)}
-                    className={({ isActive }) =>
-                      `block px-4 py-2 rounded-lg transition ${
-                        isActive
-                          ? "bg-indigo-600 text-white font-medium"
-                          : "hover:bg-gray-800 text-gray-950 font-bold"
-                      }`
-                    }
-                  >
-                    {link.name}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          {/* Bottom (optional) */}
-          <div className="mt-auto border-t border-gray-700 pt-4">
-            <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg text-sm font-semibold transition">
-              Sign In
-            </button>
-          </div>
+              {link.name}
+            </NavLink>
+          ))}
         </div>
       )}
 
       {/* Search Bar */}
       {isOpen && (
-        <form className="px-2 py-1 bg-gray-100 hidden md:block absolute top-full left-0 w-full">
+        <form className="absolute top-16 left-0 w-full bg-gray-50 px-4 py-2 shadow-inner hidden sm:block">
           <input
-            className="border w-full px-3 py-2 rounded-2xl focus:outline-none"
+            className="w-full px-4 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-indigo-400"
             type="text"
-            placeholder="Search products..."
+            placeholder="Search for products..."
           />
         </form>
       )}
